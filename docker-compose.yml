@@ -11,7 +11,7 @@ services:
     depends_on:
       - stats_service-db
     environment:
-      - STAT_URL_DB=jdbc:postgresql://stat_server-db:5432/stat_db
+      - STAT_URL_DB=jdbc:postgresql://localhost:5432/stat_db
       - STAT_USERNAME_DB=postgres
 
 
@@ -35,7 +35,7 @@ services:
     depends_on:
       - ewm-db
     environment:
-      - MAIN_DB=jdbc:postgresql://postgres-main-db:5432/ewm_db
+      - MAIN_DB=jdbc:postgresql://localhost:5432/ewm_db
       - MAIN_USER=postgres
 
   ewm-db:
