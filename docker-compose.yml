@@ -14,7 +14,7 @@ services:
     depends_on:
       - stats_service-db
     environment:
-      - STAT_URL_DB=jdbc:postgresql://state_server-db:5432/stat_db
+      - STAT_URL_DB=jdbc:postgresql://stat_server-db:5432/stat_db
       - STAT_USERNAME_DB=postgres
 
 
