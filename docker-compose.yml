@@ -2,7 +2,7 @@ version: '3.8'
 services:
 
   stats-server:
-    build: ./ewm-stat-service/stat_server
+    build: ewm-stat-service/stat_server
     container_name: stat_server
 
     ports:
@@ -28,7 +28,7 @@ services:
 
 
   ewm-service:
-    build: ./ewm-main-service
+    build: ewm-main-service
     container_name: ewm-service
     ports:
       - "8080:8080"
