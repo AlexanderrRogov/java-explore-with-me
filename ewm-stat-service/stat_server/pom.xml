@@ -12,6 +12,7 @@
 
     <artifactId>stat_server</artifactId>
 
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
