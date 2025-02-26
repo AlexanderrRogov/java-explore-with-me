@@ -5,7 +5,7 @@ import ru.practicum.main.request.Status;
 import ru.practicum.main.event.model.Event;
 import ru.practicum.main.user.model.User;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter

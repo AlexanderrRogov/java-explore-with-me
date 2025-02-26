@@ -9,9 +9,9 @@ import ru.practicum.dto.Validator;
 import ru.practicum.main.event.location.dto.LocationDto;
 import ru.practicum.main.event.status.AdminEventStatus;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 

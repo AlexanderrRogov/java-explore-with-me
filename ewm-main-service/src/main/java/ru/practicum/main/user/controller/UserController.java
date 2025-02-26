@@ -12,8 +12,8 @@ import ru.practicum.main.user.dto.UserDtoReceived;
 import ru.practicum.main.user.mapper.UserMapper;
 import ru.practicum.main.user.service.UserService;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController

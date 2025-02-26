@@ -3,7 +3,7 @@ package ru.practicum.main.event.location.model;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Getter
 @Setter

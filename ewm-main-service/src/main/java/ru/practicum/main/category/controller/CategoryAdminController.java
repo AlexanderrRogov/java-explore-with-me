@@ -11,7 +11,7 @@ import ru.practicum.dto.Validator;
 import ru.practicum.main.category.dto.CategoryDto;
 import ru.practicum.main.category.service.CategoryAdminService;
 
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequiredArgsConstructor

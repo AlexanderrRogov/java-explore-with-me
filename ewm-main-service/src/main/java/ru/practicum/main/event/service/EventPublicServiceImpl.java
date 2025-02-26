@@ -14,7 +14,7 @@ import ru.practicum.main.event.model.Event;
 import ru.practicum.main.event.dto.EventDto;
 import ru.practicum.main.stat.service.StatService;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

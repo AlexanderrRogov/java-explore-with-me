@@ -16,7 +16,7 @@ import ru.practicum.main.exception.StatParseException;
 import ru.practicum.main.request.dto.ConfirmedRequestShortDto;
 import ru.practicum.main.request.repository.RequestMainServiceRepository;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
