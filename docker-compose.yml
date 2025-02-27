@@ -23,8 +23,9 @@ services:
 
     environment:
       - POSTGRES_DB=statdb
-      - POSTGRES_USER=ewm
-      - POSTGRES_PASSWORD=ewm
+#      - POSTGRES_USER=ewm
+#      - POSTGRES_PASSWORD=ewm
+      - POSTGRES_USER=postgres
 
   main-service:
     build: ./ewm-main-service
@@ -50,5 +51,6 @@ services:
     container_name: ewmdb
     environment:
       - POSTGRES_DB=ewmdb
-      - POSTGRES_USER=ewm
-      - POSTGRES_PASSWORD=ewm
+#      - POSTGRES_USER=ewm
+      - POSTGRES_USER=postgres
+  #    - POSTGRES_PASSWORD=ewm
