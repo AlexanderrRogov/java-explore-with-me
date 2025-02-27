@@ -1,62 +1,52 @@
-version: '3.8'
+version: '3.1'
 services:
-  stats-server:
-    build: ./ewm-stat-service/stat_server
-    image: stat_server:latest
-    container_name: stat_server
+  stat-server:
+    build: ./stat-service/server
+    image: stat-service
+    container_name: server
     ports:
       - "9090:9090"
     depends_on:
-      - stats_service-db
+      - statdb
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats_service-db:5432/stat_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=your_stats_password
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-    networks:
-      - app-network
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://statdb:5432/statdb
+      - SPRING_DATASOURCE_USERNAME=ewm
+      - SPRING_DATASOURCE_PASSWORD=ewm
+      - JAVA_OPTS=-Djdk.httpclient.HttpClient.log=errors,requests
 
-  stats_service-db:
-    image: postgres:16.1
-    container_name: stats_service-db
-    ports:
-      - "6666:5432"
+  statdb:
+    image: postgres:14-alpine
+    volumes:
+      - /var/lib/postgresql/data/
+    container_name: statdb
+
     environment:
-      - POSTGRES_DB=stat_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=your_stats_password
-    networks:
-      - app-network
+      - POSTGRES_DB=statdb
+      - POSTGRES_USER=ewm
+      - POSTGRES_PASSWORD=ewm
 
-  ewm-service:
-    build: ./ewm-main-service
-    image: ewm-service:latest
-    container_name: ewm-service
+  main-service:
+    build: ./main-service
+    image: main-service
+    container_name: main-service
     ports:
       - "8080:8080"
     depends_on:
-      - ewm-db
-      - stats-server
+      - ewmdb
+      - stat-server
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=your_ewm_password
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-    networks:
-      - app-network
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewmdb:5432/ewmdb
+      - SPRING_DATASOURCE_USERNAME=ewm
+      - SPRING_DATASOURCE_PASSWORD=ewm
+      - SERVICES_STATSSERVICE_URI=http://stat-server:9090
+    #   - JAVA_OPTS=-Djdk.httpclient.HttpClient.log=errors,requests
 
-  ewm-db:
-    image: postgres:16.1
-    container_name: ewm-db
-    ports:
-      - "6464:5432"
+  ewmdb:
+    image: postgres:14-alpine
+    volumes:
+      - /var/lib/postgresql/data/
+    container_name: ewmdb
     environment:
-      - POSTGRES_DB=ewm_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=your_ewm_password
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+      - POSTGRES_DB=ewmdb
+      - POSTGRES_USER=ewm
+      - POSTGRES_PASSWORD=ewm
