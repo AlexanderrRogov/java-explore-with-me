@@ -11,16 +11,19 @@
 
     <artifactId>ewm-stat-service</artifactId>
     <packaging>pom</packaging>
+
     <modules>
-        <module>stat_client</module>
-        <module>stat_dto</module>
         <module>stat_server</module>
+        <module>stat-dto</module>
+        <module>stat_client</module>
     </modules>
 
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>
