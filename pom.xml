@@ -67,7 +67,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.6</version>
+                    <version>4.8.6.3</version>
                     <configuration>
                         <effort>Max</effort>
                         <threshold>High</threshold>
@@ -163,7 +163,7 @@
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs-maven-plugin</artifactId>
-                        <version>4.8.6</version>
+                        <version>4.8.6.3</version>
                     </plugin>
                 </plugins>
             </build>
@@ -172,7 +172,7 @@
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs-maven-plugin</artifactId>
-                        <version>4.8.6</version>
+                        <version>4.8.6.3</version>
                     </plugin>
                 </plugins>
             </reporting>
