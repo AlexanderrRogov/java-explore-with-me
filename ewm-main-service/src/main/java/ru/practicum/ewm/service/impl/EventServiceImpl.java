@@ -351,9 +351,9 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEventById(Long eventId, HttpServletRequest request) {
         Event event = checkEvent(eventId);
-        if (!event.getEventStatus().equals(EventStatus.PUBLISHED)) {
-            throw new NotFoundException("Событие с id = " + eventId + " не опубликовано");
-        }
+//        if (!event.getEventStatus().equals(EventStatus.PUBLISHED)) {
+//            throw new NotFoundException("Событие с id = " + eventId + " не опубликовано");
+//        }
         addStatsClient(request);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
         Map<Long, Long> viewStatsMap = getViewsAllEvents(List.of(event));
