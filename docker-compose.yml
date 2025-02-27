@@ -9,10 +9,9 @@ services:
     depends_on:
       - statdb
     environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://statdb:5432/statdb
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/statdb
-      - SPRING_DATASOURCE_USERNAME=postgres
-#      - SPRING_DATASOURCE_PASSWORD=ewm
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://statdb:5432/statdb
+      - SPRING_DATASOURCE_USERNAME=ewm
+      - SPRING_DATASOURCE_PASSWORD=ewm
       - JAVA_OPTS=-Djdk.httpclient.HttpClient.log=errors,requests
 
   statdb:
@@ -23,9 +22,8 @@ services:
 
     environment:
       - POSTGRES_DB=statdb
-#      - POSTGRES_USER=ewm
-#      - POSTGRES_PASSWORD=ewm
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=ewm
+      - POSTGRES_PASSWORD=ewm
 
   main-service:
     build: ./ewm-main-service
@@ -37,10 +35,9 @@ services:
       - ewmdb
       - stat-server
     environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewmdb:5432/ewmdb
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/ewmdb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      #      - SPRING_DATASOURCE_PASSWORD=ewm
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewmdb:5432/ewmdb
+      - SPRING_DATASOURCE_USERNAME=ewm
+      - SPRING_DATASOURCE_PASSWORD=ewm
       - SERVICES_STATSSERVICE_URI=http://stat-server:9090
     #   - JAVA_OPTS=-Djdk.httpclient.HttpClient.log=errors,requests
 
@@ -51,6 +48,5 @@ services:
     container_name: ewmdb
     environment:
       - POSTGRES_DB=ewmdb
-#      - POSTGRES_USER=ewm
-      - POSTGRES_USER=postgres
-  #    - POSTGRES_PASSWORD=ewm
+      - POSTGRES_USER=ewm
+      - POSTGRES_PASSWORD=ewm
