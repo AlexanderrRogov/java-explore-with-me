@@ -39,7 +39,7 @@ public class StatServiceImpl implements StatService {
 
     private final ObjectMapper objectMapper;
 
-    @Value("${main_app}")
+    @Value("ewm-main-service")
     private String app;
 
     @Override
