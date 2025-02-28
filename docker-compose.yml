@@ -9,9 +9,9 @@ services:
     depends_on:
       - statdb
     environment:
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://statdb:5432/statdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://statdb:5432/statdb
 #      - SPRING_DATASOURCE_USERNAME=ewm
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/statdb
+ #     - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/statdb
       - SPRING_DATASOURCE_USERNAME=postgres
  #     - SPRING_DATASOURCE_PASSWORD=ewm
       - JAVA_OPTS=-Djdk.httpclient.HttpClient.log=errors,requests
@@ -38,8 +38,8 @@ services:
       - ewmdb
       - stat-server
     environment:
-      #- SPRING_DATASOURCE_URL=jdbc:postgresql://ewmdb:5432/ewmdb
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/ewmdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewmdb:5432/ewmdb
+   #   - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/ewmdb
       - SPRING_DATASOURCE_USERNAME=postgres
  #     - SPRING_DATASOURCE_PASSWORD=ewm
      # - SERVICES_STATSSERVICE_URI=http://stat-server:9090
