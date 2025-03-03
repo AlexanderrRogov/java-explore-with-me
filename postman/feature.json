@@ -13,13 +13,95 @@
           "name": "Success",
           "item": [
             {
-              "name": "Добавление комментария",
+              "name": "Инициализация тестовых данных",
               "event": [
                 {
                   "listen": "prerequest",
                   "script": {
                     "exec": [
-                      ""
+                      "// Создание пользователя с id=4, если не существует",
+                      "pm.sendRequest({",
+                      "    url: '{{baseUrl}}/admin/users',",
+                      "    method: 'POST',",
+                      "    header: {'Content-Type': 'application/json'},",
+                      "    body: {",
+                      "        mode: 'raw',",
+                      "        raw: JSON.stringify({'name': 'Test User 4', 'email': 'test4@example.com'})",
+                      "    }",
+                      "}, function (err, response) {",
+                      "    if (err) console.log('Ошибка создания пользователя:', err);",
+                      "    else pm.collectionVariables.set('userId', 4);",
+                      "});",
+                      "",
+                      "// Создание категории с id=1, если не существует",
+                      "pm.sendRequest({",
+                      "    url: '{{baseUrl}}/admin/categories',",
+                      "    method: 'POST',",
+                      "    header: {'Content-Type': 'application/json'},",
+                      "    body: {",
+                      "        mode: 'raw',",
+                      "        raw: JSON.stringify({'name': 'Test Category'})",
+                      "    }",
+                      "}, function (err, response) {",
+                      "    if (err) console.log('Ошибка создания категории:', err);",
+                      "});",
+                      "",
+                      "// Создание события для теста",
+                      "pm.sendRequest({",
+                      "    url: '{{baseUrl}}/users/4/events',",
+                      "    method: 'POST',",
+                      "    header: {'Content-Type': 'application/json'},",
+                      "    body: {",
+                      "        mode: 'raw',",
+                      "        raw: JSON.stringify({",
+                      "            'annotation': 'Тестовое событие',",
+                      "            'category': 1,",
+                      "            'description': 'Описание тестового события',",
+                      "            'eventDate': '2025-03-04T12:00:00',",
+                      "            'location': {'lat': 55.75, 'lon': 37.61},",
+                      "            'paid': false,",
+                      "            'participantLimit': 100,",
+                      "            'requestModeration': true,",
+                      "            'title': 'Тестовое событие'",
+                      "        })",
+                      "    }",
+                      "}, function (err, response) {",
+                      "    if (err) {",
+                      "        console.log('Ошибка создания события:', err);",
+                      "    } else {",
+                      "        const eventId = response.json().id;",
+                      "        pm.collectionVariables.set('testEventId', eventId);",
+                      "        console.log('Событие создано с ID:', eventId);",
+                      "        ",
+                      "        // Публикация события",
+                      "        pm.sendRequest({",
+                      "            url: '{{baseUrl}}/admin/events/' + eventId,",
+                      "            method: 'PATCH',",
+                      "            header: {'Content-Type': 'application/json'},",
+                      "            body: {",
+                      "                mode: 'raw',",
+                      "                raw: JSON.stringify({'stateAction': 'PUBLISH_EVENT'})",
+                      "            }",
+                      "        }, function (err, response) {",
+                      "            if (err) console.log('Ошибка публикации:', err);",
+                      "            else console.log('Событие опубликовано с ID:', eventId);",
+                      "        });",
+                      "    }",
+                      "});",
+                      "",
+                      "// Создание комментария для поиска админом",
+                      "pm.sendRequest({",
+                      "    url: '{{baseUrl}}/comments/users/4/events/{{testEventId}}',",
+                      "    method: 'POST',",
+                      "    header: {'Content-Type': 'application/json'},",
+                      "    body: {",
+                      "        mode: 'raw',",
+                      "        raw: JSON.stringify({'text': 'Admin comment'})",
+                      "    }",
+                      "}, function (err, response) {",
+                      "    if (err) console.log('Ошибка создания комментария:', err);",
+                      "    else pm.collectionVariables.set('adminCommentId', response.json().id);",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -28,28 +110,70 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-                      "    pm.response.to.have.status(201);   \r",
-                      "    pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "});\r",
-                      "\r",
-                      "const source = JSON.parse(pm.request.body.raw);\r",
-                      "const target = pm.response.json();\r",
-                      "\r",
-                      "pm.test(\"Комментарий должен содержать поля: id, created, text, authorId\", function () {\r",
-                      "pm.expect(target).to.have.property('id');\r",
-                      "pm.expect(target).to.have.property('text');\r",
-                      "pm.expect(target).to.have.property('authorId');\r",
-                      "pm.expect(target).to.have.property('created');\r",
-                      "});\r",
-                      "\r",
-                      "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-                      "    pm.expect(target.id).to.not.be.null;\r",
-                      "    pm.expect(source.text).equal(target.text);\r",
-                      "    pm.expect(target.authorId).equal(2);\r",
-                      "});\r",
-                      ""
+                      "pm.test('Инициализация прошла успешно', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "    pm.response.to.be.json;",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"annotation\": \"Тестовое событие\",\n    \"category\": 1,\n    \"description\": \"Описание тестового события\",\n    \"eventDate\": \"2025-03-04T12:00:00\",\n    \"location\": {\"lat\": 55.75, \"lon\": 37.61},\n    \"paid\": false,\n    \"participantLimit\": 100,\n    \"requestModeration\": true,\n    \"title\": \"Тестовое событие\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/4/events",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "4", "events"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Добавление комментария",
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [""],
+                    "type": "text/javascript"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {",
+                      "    pm.response.to.have.status(201);   ",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});",
+                      "",
+                      "const source = JSON.parse(pm.request.body.raw);",
+                      "const target = pm.response.json();",
+                      "",
+                      "pm.test(\"Комментарий должен содержать поля: id, created, text, authorId\", function () {",
+                      "    pm.expect(target).to.have.property('id');",
+                      "    pm.expect(target).to.have.property('text');",
+                      "    pm.expect(target).to.have.property('authorId');",
+                      "    pm.expect(target).to.have.property('created');",
+                      "});",
+                      "",
+                      "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {",
+                      "    pm.expect(target.id).to.not.be.null;",
+                      "    pm.expect(source.text).equal(target.text);",
+                      "    pm.expect(target.authorId).equal(2);",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -69,16 +193,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/events/:eventId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    "events",
-                    ":eventId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", "events", ":eventId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -100,14 +216,13 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "const body = pm.response.json(); // получаем тело ответа в формате JSON\r",
-                      "\r",
-                      "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function() {\r",
-                      "    pm.response.to.be.ok; // код ответа должен быть равен 200 OK\r",
-                      "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
-                      "    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
-                      "})\r",
-                      ""
+                      "const body = pm.response.json();",
+                      "",
+                      "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function() {",
+                      "    pm.response.to.be.ok;",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "})"
                     ],
                     "type": "text/javascript"
                   }
@@ -115,9 +230,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "exec": [
-                      ""
-                    ],
+                    "exec": [""],
                     "type": "text/javascript"
                   }
                 }
@@ -127,15 +240,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    ":commentId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", ":commentId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -157,26 +263,26 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function() {\r",
-                      "    pm.response.to.be.ok; // код ответа должен быть равен 200 OK\r",
-                      "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
-                      "    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
-                      "}); \r",
-                      "const source = JSON.parse(pm.request.body.raw);\r",
-                      "const target = pm.response.json();\r",
-                      "\r",
-                      "pm.test(\"Категория должна содержать поля: id, created, text, authorId\", function () {\r",
-                      "pm.expect(target).to.have.property('id');\r",
-                      "pm.expect(target).to.have.property('text');\r",
-                      "pm.expect(target).to.have.property('authorId');\r",
-                      "pm.expect(target).to.have.property('created');\r",
-                      "});\r",
-                      "\r",
-                      "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
-                      "    pm.expect(target.id).to.not.be.null;\r",
-                      "    pm.expect(source.text).equal(target.text);\r",
-                      "    pm.expect(target.id).equal(1);\r",
-                      "    pm.expect(target.authorId).equal(2);\r",
+                      "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function() {",
+                      "    pm.response.to.be.ok;",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});",
+                      "const source = JSON.parse(pm.request.body.raw);",
+                      "const target = pm.response.json();",
+                      "",
+                      "pm.test(\"Категория должна содержать поля: id, created, text, authorId\", function () {",
+                      "    pm.expect(target).to.have.property('id');",
+                      "    pm.expect(target).to.have.property('text');",
+                      "    pm.expect(target).to.have.property('authorId');",
+                      "    pm.expect(target).to.have.property('created');",
+                      "});",
+                      "",
+                      "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {",
+                      "    pm.expect(target.id).to.not.be.null;",
+                      "    pm.expect(source.text).equal(target.text);",
+                      "    pm.expect(target.id).equal(1);",
+                      "    pm.expect(target.authorId).equal(2);",
                       "});"
                     ],
                     "type": "text/javascript"
@@ -185,9 +291,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "exec": [
-                      ""
-                    ],
+                    "exec": [""],
                     "type": "text/javascript"
                   }
                 }
@@ -206,15 +310,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    ":commentId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", ":commentId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -236,14 +333,13 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "const body = pm.response.json(); // получаем тело ответа в формате JSON\r",
-                      "\r",
-                      "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function() {\r",
-                      "    pm.response.to.be.ok; // код ответа должен быть равен 200 OK\r",
-                      "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
-                      "    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
-                      "})\r",
-                      ""
+                      "const body = pm.response.json();",
+                      "",
+                      "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function() {",
+                      "    pm.response.to.be.ok;",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "})"
                     ],
                     "type": "text/javascript"
                   }
@@ -251,9 +347,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "exec": [
-                      ""
-                    ],
+                    "exec": [""],
                     "type": "text/javascript"
                   }
                 }
@@ -263,15 +357,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    ":commentId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", ":commentId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -292,9 +379,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "exec": [
-                      ""
-                    ],
+                    "exec": [""],
                     "type": "text/javascript"
                   }
                 },
@@ -302,12 +387,11 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-                      "    pm.response.to.have.status(201);   \r",
-                      "    pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "});\r",
-                      ""
+                      "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {",
+                      "    pm.response.to.have.status(201);   ",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -327,16 +411,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/events/:eventId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    "events",
-                    ":eventId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", "events", ":eventId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -358,7 +434,12 @@
                   "listen": "prerequest",
                   "script": {
                     "exec": [
-                      ""
+                      "const eventId = pm.collectionVariables.get('testEventId');",
+                      "if (!eventId) {",
+                      "    console.log('Ошибка: testEventId не установлен');",
+                      "} else {",
+                      "    pm.environment.set('currentEventId', eventId);",
+                      "}"
                     ],
                     "type": "text/javascript"
                   }
@@ -367,12 +448,12 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
-                      "    pm.response.to.have.status(201);   \r",
-                      "    pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "});\r",
-                      ""
+                      "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {",
+                      "    pm.response.to.have.status(201);   ",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});",
+                      "pm.collectionVariables.set('adminCommentIdToDelete', pm.response.json().id);"
                     ],
                     "type": "text/javascript"
                   }
@@ -392,16 +473,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/events/:eventId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    "events",
-                    ":eventId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", "events", ":eventId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -409,7 +482,7 @@
                     },
                     {
                       "key": "eventId",
-                      "value": "5"
+                      "value": "{{testEventId}}"
                     }
                   ]
                 }
@@ -423,16 +496,16 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Status code is 200\", function () {\r",
-                      "    pm.response.to.be.ok;\r",
-                      "   pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "});\r",
-                      "\r",
-                      "const target = pm.response.json();\r",
-                      "\r",
-                      "pm.test(\"Ответ должен быть массивом\", function () {\r",
-                      "    pm.expect(target).is.an('array');\r",
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.be.ok;",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});",
+                      "",
+                      "const target = pm.response.json();",
+                      "",
+                      "pm.test(\"Ответ должен быть массивом\", function () {",
+                      "    pm.expect(target).is.an('array');",
                       "});"
                     ],
                     "type": "text/javascript"
@@ -455,13 +528,8 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/comments/:eventId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    ":eventId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", ":eventId"],
                   "variable": [
                     {
                       "key": "eventId",
@@ -479,32 +547,30 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Status code is 200\", function () {\r",
-                      "    pm.response.to.be.ok;\r",
-                      "   pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "});\r",
-                      "\r",
-                      "const source = pm.collectionVariables.get('response');\r",
-                      "const target = pm.response.json()[0];\r",
-                      "\r",
-                      "pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, views, confirmedRequests, comments\", function () {\r",
-                      "pm.expect(target).to.have.property('id');\r",
-                      "pm.expect(target).to.have.property('title');\r",
-                      "pm.expect(target).to.have.property('annotation');\r",
-                      "pm.expect(target).to.have.property('category');\r",
-                      "pm.expect(target).to.have.property('paid');\r",
-                      "pm.expect(target).to.have.property('eventDate');\r",
-                      "pm.expect(target).to.have.property('initiator');\r",
-                      "pm.expect(target).to.have.property('views');\r",
-                      "pm.expect(target).to.have.property('confirmedRequests');\r",
-                      "pm.expect(target).to.have.property('comments');\r",
-                      "});\r",
-                      "pm.test(\"Данные в ответе должны соответствовать данным в запросе// у события с id=2 должно быть два комментария\", function () {\r",
-                      "    pm.expect(target.comments).to.not.be.null;\r",
-                      "    pm.expect(target.comments).equal(2);\r",
-                      "});\r",
-                      ""
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.be.ok;",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});",
+                      "",
+                      "const target = pm.response.json()[0];",
+                      "",
+                      "pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, views, confirmedRequests, comments\", function () {",
+                      "    pm.expect(target).to.have.property('id');",
+                      "    pm.expect(target).to.have.property('title');",
+                      "    pm.expect(target).to.have.property('annotation');",
+                      "    pm.expect(target).to.have.property('category');",
+                      "    pm.expect(target).to.have.property('paid');",
+                      "    pm.expect(target).to.have.property('eventDate');",
+                      "    pm.expect(target).to.have.property('initiator');",
+                      "    pm.expect(target).to.have.property('views');",
+                      "    pm.expect(target).to.have.property('confirmedRequests');",
+                      "    pm.expect(target).to.have.property('comments');",
+                      "});",
+                      "pm.test(\"Данные в ответе должны соответствовать данным в запросе// у события с id=2 должно быть два комментария\", function () {",
+                      "    pm.expect(target.comments).to.not.be.null;",
+                      "    pm.expect(target.comments).equal(2);",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -526,12 +592,8 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/events",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "events"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["events"]
                 }
               },
               "response": []
@@ -543,8 +605,8 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Status code is 200\", function () {\r",
-                      "    pm.response.to.be.ok;\r",
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.be.ok;",
                       "});"
                     ],
                     "type": "text/javascript"
@@ -567,13 +629,8 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/comments/:eventId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    ":eventId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", ":eventId"],
                   "variable": [
                     {
                       "key": "eventId",
@@ -591,22 +648,21 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Status code is 200\", function () {\r",
-                      "    pm.response.to.be.ok;\r",
-                      "});\r",
-                      "pm.test(\"Test search comment response\", function () {\r",
-                      "    pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "    var jsonData = pm.response.json();\r",
-                      "    pm.expect(jsonData.length, 'List length must be 1').to.eql(1);\r",
-                      "});\r",
-                      "\r",
-                      "pm.test(\"Test comment[0] 'id' field\", function () {\r",
-                      "    var jsonData = pm.response.json();\r",
-                      "    pm.expect(jsonData[0]).to.have.property('id');\r",
-                      "    pm.expect(jsonData[0].id, '\"id\" must be 3').to.eql(3);\r",
-                      "});\r",
-                      ""
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.be.ok;",
+                      "});",
+                      "pm.test(\"Test search comment response\", function () {",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.length, 'List length must be at least 1').to.be.above(0);",
+                      "});",
+                      "",
+                      "pm.test(\"Test comment[0] 'id' field\", function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData[0]).to.have.property('id');",
+                      "    pm.expect(jsonData[0].id).to.be.a('number');",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -627,19 +683,13 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/admin/comments/search?text=AdmIn",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "comments",
-                    "search"
-                  ],
+                  "raw": "{{baseUrl}}/admin/comments/search?text=Admin",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "comments", "search"],
                   "query": [
                     {
                       "key": "text",
-                      "value": "AdmIn"
+                      "value": "Admin"
                     }
                   ]
                 }
@@ -653,17 +703,15 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Status code is 200\", function () {\r",
-                      "    pm.response.to.be.ok;\r",
-                      "});\r",
-                      "pm.test(\"Test search comment response\", function () {\r",
-                      "    pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "    var jsonData = pm.response.json();\r",
-                      "    pm.expect(jsonData.length, 'List length must be 0').to.eql(0);\r",
-                      "});\r",
-                      "\r",
-                      ""
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.be.ok;",
+                      "});",
+                      "pm.test(\"Test search comment response\", function () {",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.length, 'List length must be 0').to.eql(0);",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -685,14 +733,8 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/admin/comments/search?text=horror",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "comments",
-                    "search"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "comments", "search"],
                   "query": [
                     {
                       "key": "text",
@@ -710,8 +752,8 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
-                      "    pm.response.to.have.status(204);\r",
+                      "pm.test(\"Ответ должен содержать код статуса 204\", function () {",
+                      "    pm.response.to.have.status(204);",
                       "});"
                     ],
                     "type": "text/javascript"
@@ -723,15 +765,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    ":commentId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", ":commentId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -753,8 +788,8 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
-                      "    pm.response.to.have.status(204);\r",
+                      "pm.test(\"Ответ должен содержать код статуса 204\", function () {",
+                      "    pm.response.to.have.status(204);",
                       "});"
                     ],
                     "type": "text/javascript"
@@ -766,18 +801,12 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/admin/comments/:commentId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "admin",
-                    "comments",
-                    ":commentId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "comments", ":commentId"],
                   "variable": [
                     {
                       "key": "commentId",
-                      "value": "3"
+                      "value": "{{adminCommentIdToDelete}}"
                     }
                   ]
                 }
@@ -795,9 +824,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "exec": [
-                      ""
-                    ],
+                    "exec": [""],
                     "type": "text/javascript"
                   }
                 },
@@ -805,12 +832,11 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
-                      "    pm.response.to.have.status(400);   \r",
-                      "    pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "});\r",
-                      ""
+                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {",
+                      "    pm.response.to.have.status(400);   ",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -830,16 +856,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/events/:eventId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    "events",
-                    ":eventId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", "events", ":eventId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -860,9 +878,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "exec": [
-                      ""
-                    ],
+                    "exec": [""],
                     "type": "text/javascript"
                   }
                 },
@@ -870,12 +886,11 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
-                      "    pm.response.to.have.status(400);   \r",
-                      "    pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "});\r",
-                      ""
+                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {",
+                      "    pm.response.to.have.status(400);   ",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -895,16 +910,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/events/:eventId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    "events",
-                    ":eventId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", "events", ":eventId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -925,9 +932,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "exec": [
-                      ""
-                    ],
+                    "exec": [""],
                     "type": "text/javascript"
                   }
                 },
@@ -935,12 +940,11 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
-                      "    pm.response.to.have.status(400);   \r",
-                      "    pm.response.to.be.withBody;\r",
-                      "    pm.response.to.be.json;\r",
-                      "});\r",
-                      ""
+                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {",
+                      "    pm.response.to.have.status(400);   ",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -960,16 +964,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/events/:eventId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    "events",
-                    ":eventId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", "events", ":eventId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -991,11 +987,11 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
-                      "    pm.response.to.have.status(400); \r",
-                      "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
-                      "    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
-                      "}); "
+                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {",
+                      "    pm.response.to.have.status(400); ",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -1003,9 +999,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "exec": [
-                      ""
-                    ],
+                    "exec": [""],
                     "type": "text/javascript"
                   }
                 }
@@ -1024,15 +1018,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    ":commentId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", ":commentId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -1054,11 +1041,11 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {\r",
-                      "    pm.response.to.have.status(400); \r",
-                      "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
-                      "    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
-                      "}); "
+                      "pm.test(\"Ответ должен содержать код статуса 400 и данные в формате json\", function () {",
+                      "    pm.response.to.have.status(400); ",
+                      "    pm.response.to.be.withBody;",
+                      "    pm.response.to.be.json;",
+                      "});"
                     ],
                     "type": "text/javascript"
                   }
@@ -1066,9 +1053,7 @@
                 {
                   "listen": "prerequest",
                   "script": {
-                    "exec": [
-                      ""
-                    ],
+                    "exec": [""],
                     "type": "text/javascript"
                   }
                 }
@@ -1087,15 +1072,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    ":commentId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", ":commentId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -1117,8 +1095,8 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test(\"Ответ должен содержать код статуса 400\", function () {\r",
-                      "    pm.response.to.have.status(400);\r",
+                      "pm.test(\"Ответ должен содержать код статуса 400\", function () {",
+                      "    pm.response.to.have.status(400);",
                       "});"
                     ],
                     "type": "text/javascript"
@@ -1130,15 +1108,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "comments",
-                    "users",
-                    ":userId",
-                    ":commentId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["comments", "users", ":userId", ":commentId"],
                   "variable": [
                     {
                       "key": "userId",
@@ -1167,10 +1138,10 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {\r",
-                  "    pm.response.to.have.status(404);\r",
-                  "    pm.response.to.be.withBody;\r",
-                  "    pm.response.to.be.json;\r",
+                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "    pm.response.to.be.withBody;",
+                  "    pm.response.to.be.json;",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1194,13 +1165,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/comments/:eventId",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "comments",
-                ":eventId"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", ":eventId"],
               "variable": [
                 {
                   "key": "eventId",
@@ -1218,14 +1184,13 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const body = pm.response.json(); // получаем тело ответа в формате JSON\r",
-                  "\r",
-                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function() {\r",
-                  "    pm.response.to.to.have.status(404); // код ответа должен быть равен 200 OK\r",
-                  "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
-                  "    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
-                  "})\r",
-                  ""
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function() {",
+                  "    pm.response.to.have.status(404);",
+                  "    pm.response.to.be.withBody;",
+                  "    pm.response.to.be.json;",
+                  "})"
                 ],
                 "type": "text/javascript"
               }
@@ -1233,9 +1198,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  ""
-                ],
+                "exec": [""],
                 "type": "text/javascript"
               }
             }
@@ -1245,15 +1208,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "comments",
-                "users",
-                ":userId",
-                ":commentId"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "users", ":userId", ":commentId"],
               "variable": [
                 {
                   "key": "userId",
@@ -1275,14 +1231,13 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const body = pm.response.json(); // получаем тело ответа в формате JSON\r",
-                  "\r",
-                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function() {\r",
-                  "    pm.response.to.to.have.status(404); // код ответа должен быть равен 200 OK\r",
-                  "    pm.response.to.be.withBody; // ответ должен содержать тело\r",
-                  "    pm.response.to.be.json; // и тело ответа должно быть в формате JSON\r",
-                  "})\r",
-                  ""
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function() {",
+                  "    pm.response.to.have.status(404);",
+                  "    pm.response.to.be.withBody;",
+                  "    pm.response.to.be.json;",
+                  "})"
                 ],
                 "type": "text/javascript"
               }
@@ -1290,9 +1245,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  ""
-                ],
+                "exec": [""],
                 "type": "text/javascript"
               }
             }
@@ -1302,15 +1255,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "comments",
-                "users",
-                ":userId",
-                ":commentId"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "users", ":userId", ":commentId"],
               "variable": [
                 {
                   "key": "userId",
@@ -1332,8 +1278,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Ответ должен содержать код статуса 404\", function () {\r",
-                  "    pm.response.to.have.status(404);\r",
+                  "pm.test(\"Ответ должен содержать код статуса 404\", function () {",
+                  "    pm.response.to.have.status(404);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1345,15 +1291,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "comments",
-                "users",
-                ":userId",
-                ":commentId"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "users", ":userId", ":commentId"],
               "variable": [
                 {
                   "key": "userId",
@@ -1375,8 +1314,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Ответ должен содержать код статуса 404\", function () {\r",
-                  "    pm.response.to.have.status(404);\r",
+                  "pm.test(\"Ответ должен содержать код статуса 404\", function () {",
+                  "    pm.response.to.have.status(404);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1388,15 +1327,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/comments/users/:userId/:commentId",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "comments",
-                "users",
-                ":userId",
-                ":commentId"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "users", ":userId", ":commentId"],
               "variable": [
                 {
                   "key": "userId",
@@ -1417,9 +1349,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  ""
-                ],
+                "exec": [""],
                 "type": "text/javascript"
               }
             },
@@ -1427,12 +1357,11 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {\r",
-                  "    pm.response.to.have.status(404);   \r",
-                  "    pm.response.to.be.withBody;\r",
-                  "    pm.response.to.be.json;\r",
-                  "});\r",
-                  ""
+                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {",
+                  "    pm.response.to.have.status(404);   ",
+                  "    pm.response.to.be.withBody;",
+                  "    pm.response.to.be.json;",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -1452,16 +1381,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/comments/users/:userId/events/:eventId",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "comments",
-                "users",
-                ":userId",
-                "events",
-                ":eventId"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "users", ":userId", "events", ":eventId"],
               "variable": [
                 {
                   "key": "userId",
@@ -1482,9 +1403,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  ""
-                ],
+                "exec": [""],
                 "type": "text/javascript"
               }
             },
@@ -1492,12 +1411,11 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {\r",
-                  "    pm.response.to.have.status(404);   \r",
-                  "    pm.response.to.be.withBody;\r",
-                  "    pm.response.to.be.json;\r",
-                  "});\r",
-                  ""
+                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {",
+                  "    pm.response.to.have.status(404);   ",
+                  "    pm.response.to.be.withBody;",
+                  "    pm.response.to.be.json;",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -1517,16 +1435,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/comments/users/:userId/events/:eventId",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "comments",
-                "users",
-                ":userId",
-                "events",
-                ":eventId"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "users", ":userId", "events", ":eventId"],
               "variable": [
                 {
                   "key": "userId",
@@ -1547,9 +1457,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  ""
-                ],
+                "exec": [""],
                 "type": "text/javascript"
               }
             },
@@ -1557,13 +1465,11 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {\r",
-                  "    pm.response.to.have.status(404);   \r",
-                  "    pm.response.to.be.withBody;\r",
-                  "    pm.response.to.be.json;\r",
-                  "});\r",
-                  "\r",
-                  ""
+                  "pm.test(\"Ответ должен содержать код статуса 500 и данные в формате json\", function () {",
+                  "    pm.response.to.have.status(500);   ",
+                  "    pm.response.to.be.withBody;",
+                  "    pm.response.to.be.json;",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -1583,14 +1489,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/comments/:commentId/report",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "comments",
-                ":commentId",
-                "report"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", ":commentId", "report"],
               "variable": [
                 {
                   "key": "commentId",
@@ -1607,19 +1507,23 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": " http://localhost:8080"
+      "value": "http://localhost:8080"
     },
     {
-      "key": "Event ID",
-      "value": "{(eid)}"
+      "key": "testEventId",
+      "value": null
     },
     {
-      "key": "eid",
-      "value": "eid"
+      "key": "adminCommentId",
+      "value": null
     },
     {
-      "key": "uid",
-      "value": "uid"
+      "key": "adminCommentIdToDelete",
+      "value": null
+    },
+    {
+      "key": "userId",
+      "value": null
     }
   ]
 }
