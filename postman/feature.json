@@ -57,7 +57,7 @@
                       "            'annotation': 'Тестовое событие',",
                       "            'category': 1,",
                       "            'description': 'Описание тестового события',",
-                      "            'eventDate': '2025-03-04T12:00:00.000',",
+                      "            'eventDate': '2025-03-04T12:00:00.000000',",
                       "            'location': {'lat': 55.75, 'lon': 37.61},",
                       "            'paid': false,",
                       "            'participantLimit': 100,",
@@ -91,7 +91,7 @@
                       "",
                       "// Создание комментария для поиска админом",
                       "pm.sendRequest({",
-                      "    url: '{{baseUrl}}/comments/users/4/events/{{testEventId}}',",
+                      "    url: '{{baseUrl}}/comments/users/4/events/' + pm.collectionVariables.get('testEventId'),",
                       "    method: 'POST',",
                       "    header: {'Content-Type': 'application/json'},",
                       "    body: {",
@@ -124,7 +124,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"annotation\": \"Тестовое событие\",\n    \"category\": 1,\n    \"description\": \"Описание тестового события\",\n    \"eventDate\": \"2025-03-04T12:00:00.000\",\n    \"location\": {\"lat\": 55.75, \"lon\": 37.61},\n    \"paid\": false,\n    \"participantLimit\": 100,\n    \"requestModeration\": true,\n    \"title\": \"Тестовое событие\"\n}",
+                  "raw": "{\n    \"annotation\": \"Тестовое событие\",\n    \"category\": 1,\n    \"description\": \"Описание тестового события\",\n    \"eventDate\": \"2025-03-04T12:00:00.000000\",\n    \"location\": {\"lat\": 55.75, \"lon\": 37.61},\n    \"paid\": false,\n    \"participantLimit\": 100,\n    \"requestModeration\": true,\n    \"title\": \"Тестовое событие\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
