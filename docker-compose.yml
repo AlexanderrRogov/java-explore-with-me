@@ -1,7 +1,7 @@
 services:
   stats-server:
     build: ./ewm-stat-service/stat_server
-    image: stat-service
+    image: stats-service
     container_name: server
     ports:
       - "9090:9090"
