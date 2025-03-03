@@ -1,18 +1,19 @@
-package ru.practicum.ewm.dto;
+package ru.practicum.ewm.dto.comment;
+
 
 import lombok.*;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryDto {
-    private Long id;
+public class UpdateCommentDto {
     @NotBlank
-    @Size(min = 1, max = 50)
-    private String name;
+    @Size(min = 2, max = 1500)
+    private String text;
 }

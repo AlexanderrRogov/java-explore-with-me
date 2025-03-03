@@ -1,20 +1,17 @@
-package ru.practicum.ewm.dto;
+package ru.practicum.ewm.dto.category;
 
 import lombok.*;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NewCompilationDto {
-    private Boolean pinned;
+public class NewCategoryDto {
     @NotBlank
     @Size(min = 1, max = 50)
-    private String title;
-    private Set<Long> events;
+    private String name;
 }
