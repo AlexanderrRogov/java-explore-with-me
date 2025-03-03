@@ -1,7 +1,7 @@
 services:
-  stats-server:
+  stat-server:
     build: ./ewm-stat-service/stat_server
-    image: stats-service
+    image: stat-service
     container_name: server
     ports:
       - "9090:9090"
@@ -32,12 +32,12 @@ services:
       - "8080:8080"
     depends_on:
       - ewmdb
-      - stats-server
+      - stat-server
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewmdb:5432/ewmdb
       - SPRING_DATASOURCE_USERNAME=ewm
       - SPRING_DATASOURCE_PASSWORD=ewm
-      - SERVICES_STATSSERVICE_URI=http://stats-server:9090
+      - SERVICES_STATSSERVICE_URI=http://stat-server:9090
     #   - JAVA_OPTS=-Djdk.httpclient.HttpClient.log=errors,requests
 
   ewmdb:
